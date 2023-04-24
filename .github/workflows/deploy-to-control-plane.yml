@@ -6,8 +6,8 @@ name: Deploy-To-Control-Plane
 on:
   # Uncomment the lines you want actions that will cause the workflow to Triggers the workflow on push or pull request events but only for the main branch
 
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
   # pull_request:
   #   branches: [main]
 
@@ -39,7 +39,7 @@ jobs:
         run: |
           sudo npm install -g @controlplane/cli
           cpln --version
-   
+
       # Containerize and push the application to the org's private image repository. The tag is the short SHA of the commit.
       - name: Containerize application and push image
         shell: bash
@@ -57,11 +57,9 @@ jobs:
           sed -i "s/WORKLOAD_NAME/${CPLN_WORKLOAD}/" cpln-workload.yaml
           sed -i "s/IMAGE_NAME_TAG/${CPLN_IMAGE}:${{steps.vars.outputs.sha_short}}/" cpln-workload.yaml
 
-      - name: Run CPLN Apply 
+      - name: Run CPLN Apply
         shell: bash
         working-directory: ./cpln
         run: |
           cpln apply -f cpln-gvc.yaml
           cpln apply -f cpln-workload.yaml --gvc ${CPLN_GVC}
-          
-
